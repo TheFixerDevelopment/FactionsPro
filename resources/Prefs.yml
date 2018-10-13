@@ -56,7 +56,7 @@ BroadcastFactionCreation: true
 FactionCreationBroadcastMessage: "The player named: §2%PLAYER% §ahas created a faction §anamed §2%FACTION%"
 BroadcastFactionDisband: true
 # Currently in BETA, so it may not function very well.
-FactionDisbandBroadcast: "The Faction named %FACTION% was disbaned by %PLAYER%"
+FactionDisbandBroadcast: "The Faction named %FACTION% was disbanded by %PLAYER%"
 defaultFactionBalance: 0
 # NEW: When creating a faction, how much Money should a faction have by default? Default: 0.
 MOTDTime: 30
