@@ -240,8 +240,6 @@ class FactionCommands {
                         $result = $stmt->execute();
                         $sender->sendMessage($this->plugin->formatMessage("$prefix §aYou are no longer leader. §bYou made §a$args[1] §bThe leader of this faction", true));
                         $player->sendMessage($this->plugin->formatMessage("§aYou are now leader \nof §3$factionName!", true));
-			if($this->plugin->prefs->get("enable-faction-tag") == true){ //To-Do see if this method actually works.
-		$this->plugin->getScheduler()->scheduleRepeatingTask(new updateTagTask($this->plugin), 20); //To-Do see if this method actually works.
                     }
 					 /////////////////////////////// PROMOTE ///////////////////////////////
                     if ($args[0] == "promote") {
