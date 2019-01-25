@@ -14,7 +14,6 @@ use pocketmine\math\Vector3;
 use onebone\economyapi\EconomyAPI;
 
 use FactionsPro\tasks\updateTagTask;
-
 class FactionMain extends PluginBase implements Listener {
 	
     public $db;
@@ -52,8 +51,6 @@ class FactionMain extends PluginBase implements Listener {
 		if (!$this->economyapi) {
 	        $this->getLogger()->info("Add EconomyAPI to use the f value system.");
 		}
-		if($this->prefs->get("enable-faction-tag") == true){
-		 $this->getScheduler()->scheduleRepeatingTask(new updateTagTask($this), 20);
         $this->fCommand = new FactionCommands($this);
          $this->prefs = new Config($this->getDataFolder() . "Prefs.yml", CONFIG::YAML, array(
             "MaxFactionNameLength" => 15,
@@ -98,6 +95,8 @@ class FactionMain extends PluginBase implements Listener {
 			"empty" => 100
                 ],
 		));
+			if($this->prefs->get("enable-faction-tag") == "true"){
+		 $this->getScheduler()->scheduleRepeatingTask(new updateTagTask($this), 20);
 		$this->prefix = $this->prefs->get("prefix", $this->prefix);
 		$this->db = new \SQLite3($this->getDataFolder() . "FactionsPro.db");
 		$this->db->exec("CREATE TABLE IF NOT EXISTS master (player TEXT PRIMARY KEY COLLATE NOCASE, faction TEXT, rank TEXT);");

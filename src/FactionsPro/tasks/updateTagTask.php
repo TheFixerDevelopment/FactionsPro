@@ -1,7 +1,7 @@
 <?php
 
 namespace FactionsPro\tasks;
-use FactionsPro\FactionsMain;
+use FactionsPro\FactionMain;
 use pocketmine\Server;
 use pocketmine\scheduler\Task;
 use pocketmine\Player;
@@ -10,7 +10,7 @@ class updateTagTask extends Task{
 	
 	public $plugin;
 	
-	public function __construct(FactionsMain $plugin){
+	public function __construct(FactionMain $plugin){
 		$this->plugin = $plugin;
 	}
 	public function onRun(int $currentTick){
