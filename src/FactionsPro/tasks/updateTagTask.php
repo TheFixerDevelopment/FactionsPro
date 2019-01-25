@@ -7,6 +7,9 @@ use pocketmine\scheduler\Task;
 use pocketmine\Player;
 
 class updateTagTask extends Task{
+	
+	public $plugin;
+	
 	public function __construct(FactionsMain $plugin){
 		$this->plugin = $plugin;
 	}
