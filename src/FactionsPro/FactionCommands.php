@@ -10,6 +10,8 @@ use pocketmine\utils\TextFormat;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 
+use FactionsPro\tasks\FactionsWarTask;
+
 class FactionCommands {
     public $plugin;
 	// ASCII Map
@@ -84,7 +86,7 @@ class FactionCommands {
                             foreach ($this->plugin->war_req as $r => $f) {
                                 if ($r == $args[1] && $f == $sFaction) {
                                     foreach ($this->plugin->getServer()->getOnlinePlayers() as $p) {
-                                        $task = new FactionWar($this->plugin, $r);
+                                        $task = new FactionWarTask($this->plugin, $r);
                                         $handler = $this->plugin->getScheduler()->scheduleDelayedTask($task, 20 * 60 * 2);
                                         $task->setHandler($handler);
                                         $p->sendMessage("$prefix §bThe war against §a$factionName §band §a$sFaction §bhas started!");
@@ -151,7 +153,6 @@ class FactionCommands {
                             $this->plugin->updateAllies($factionName);
                             $this->plugin->setFactionPower($factionName, $this->plugin->prefs->get("TheDefaultPowerEveryFactionStartsWith"));
 			    $this->plugin->setBalance($factionName, $this->plugin->prefs->get("defaultFactionBalance"));
-			    $this->plugin->updateTag($playerName);
                             $this->plugin->getServer()->broadcastMessage("§a$playerName §bhas created a faction named §c$factionName");
                             $sender->sendMessage($this->plugin->formatMessage("$prefix §bYour Faction named §a$factionName §bhas been created. §6Next, use /f desc to make a faction description.", true));
 			    var_dump($this->plugin->db->query("SELECT * FROM balance;")->fetchArray(SQLITE3_ASSOC));
@@ -239,8 +240,8 @@ class FactionCommands {
                         $result = $stmt->execute();
                         $sender->sendMessage($this->plugin->formatMessage("$prefix §aYou are no longer leader. §bYou made §a$args[1] §bThe leader of this faction", true));
                         $player->sendMessage($this->plugin->formatMessage("§aYou are now leader \nof §3$factionName!", true));
-			$this->plugin->updateTag($sender->getName());
-                       // $this->plugin->updateTag($this->plugin->getServer()->getPlayer($args[1])->getName());
+			if($this->plugin->prefs->get("enable-faction-tag") == true){ //To-Do see if this method actually works.
+		$this->plugin->getScheduler()->scheduleRepeatingTask(new updateTagTask($this->plugin), 20); //To-Do see if this method actually works.
                     }
 					 /////////////////////////////// PROMOTE ///////////////////////////////
                     if ($args[0] == "promote") {
@@ -278,7 +279,6 @@ class FactionCommands {
                         $sender->sendMessage($this->plugin->formatMessage("§5$args[1] §dhas been promoted to Officer", true));
                         if ($promotee instanceof Player) {
                             $promotee->sendMessage($this->plugin->formatMessage("$prefix §dYou were promoted to officer of §5$factionName!", true));
-                           $this->plugin->updateTag($args[1]);
                             return true;
                         }
                     }
@@ -318,7 +318,6 @@ class FactionCommands {
                         $sender->sendMessage($this->plugin->formatMessage("§5$args[1] §dhas been demoted to Member", true));
                         if ($demotee instanceof Player) {
                             $demotee->sendMessage($this->plugin->formatMessage("$prefix §dYou were demoted to member of §5$factionName!", true));
-                            $this->plugin->updateTag($args[1]);
                             return true;
                         }
                     }
@@ -353,7 +352,6 @@ class FactionCommands {
                         $this->plugin->subtractFactionPower($factionName, $this->plugin->prefs->get("PowerGainedPerPlayerInFaction"));
                         if ($kicked instanceof Player) {
                             $kicked->sendMessage($this->plugin->formatMessage("$prefix §dYou have been kicked from \n §5$factionName", true));
-                            $this->plugin->updateTag($args[1]);
                             return true;
                         }
                     }
@@ -446,7 +444,6 @@ class FactionCommands {
                         $this->plugin->db->query("DELETE FROM motd WHERE faction='$args[1]';");
                         $this->plugin->db->query("DELETE FROM home WHERE faction='$args[1]';");
 		        $this->plugin->db->query("DELETE FROM balance WHERE faction='$args[1]';");
-			//$this->plugin->updateTag($sender->getName());
 			unset($this->plugin->factionChatActive[$playerName]);
 			unset($this->plugin->allyChatActive[$playerName]);
 	                $this->plugin->getServer()->broadcastMessage("§4$playerName §chas forcefully deleted the faction named §4$args[1]");
@@ -665,7 +662,6 @@ class FactionCommands {
                             $this->plugin->addFactionPower($faction, $this->plugin->prefs->get("PowerGainedPerPlayerInFaction"));
 			    $this->plugin->addToBalance($faction, $this->plugin->prefs->get("MoneyGainedPerPlayerInFaction"));
 		            $inviter = $this->plugin->getServer()->getPlayerExact($array["invitedby"]);
-				$this->plugin->updateTag($sender->getName());
                             if ($inviter !== null) $inviter->sendMessage($this->plugin->formatMessage("$prefix §2$playerName §ajoined the faction", true));
                         } else {
                             $sender->sendMessage($this->plugin->formatMessage("$prefix §cInvite has expired."));
